@@ -6,11 +6,21 @@ import {
   updateNote,
   deleteNote,
 } from '../controllers/notesController.js';
+import {
+  getAllNotesSchema,
+  noteIdSchema,
+  createNoteSchema,
+  updateNoteSchema,
+} from '../validations/notesValidation.js';
 
 export const notesRouter = express.Router();
 
-notesRouter.get('/', getAllNotes);
-notesRouter.get('/:noteId', getNoteById);
-notesRouter.post('/', createNote);
-notesRouter.patch('/:noteId', updateNote);
-notesRouter.delete('/:noteId', deleteNote);
+notesRouter.get('/', getAllNotesSchema, getAllNotes);
+
+notesRouter.get('/:noteId', noteIdSchema, getNoteById);
+
+notesRouter.post('/', createNoteSchema, createNote);
+
+notesRouter.patch('/:noteId', updateNoteSchema, updateNote);
+
+notesRouter.delete('/:noteId', noteIdSchema, deleteNote);
