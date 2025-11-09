@@ -1,4 +1,5 @@
 import express from 'express';
+import { celebrate, Segments } from 'celebrate';
 import {
   getAllNotes,
   getNoteById,
@@ -12,15 +13,41 @@ import {
   createNoteSchema,
   updateNoteSchema,
 } from '../validations/notesValidation.js';
+import { authenticate } from '../middleware/authenticate.js';
 
 export const notesRouter = express.Router();
 
-notesRouter.get('/', getAllNotesSchema, getAllNotes);
+notesRouter.use(authenticate);
 
-notesRouter.get('/:noteId', noteIdSchema, getNoteById);
+notesRouter.get(
+  '/',
+  celebrate({ [Segments.QUERY]: getAllNotesSchema }),
+  getAllNotes,
+);
 
-notesRouter.post('/', createNoteSchema, createNote);
+notesRouter.get(
+  '/:noteId',
+  celebrate({ [Segments.PARAMS]: noteIdSchema }),
+  getNoteById,
+);
 
-notesRouter.patch('/:noteId', updateNoteSchema, updateNote);
+notesRouter.post(
+  '/',
+  celebrate({ [Segments.BODY]: createNoteSchema }),
+  createNote,
+);
 
-notesRouter.delete('/:noteId', noteIdSchema, deleteNote);
+notesRouter.patch(
+  '/:noteId',
+  celebrate({
+    [Segments.PARAMS]: noteIdSchema,
+    [Segments.BODY]: updateNoteSchema,
+  }),
+  updateNote,
+);
+
+notesRouter.delete(
+  '/:noteId',
+  celebrate({ [Segments.PARAMS]: noteIdSchema }),
+  deleteNote,
+);
