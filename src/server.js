@@ -19,11 +19,12 @@ app.use(cookieParser());
 
 app.use(authRouter);
 
-app.use(notesRouter);
+app.use('/notes', notesRouter);
+
+app.use(notFoundHandler);
 
 app.use(errors());
 
-app.use(notFoundHandler);
 app.use(errorHandler);
 
 const startServer = async () => {
