@@ -1,38 +1,49 @@
 import createHttpError from 'http-errors';
-import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
 import { User } from '../models/user.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
 
+// Контролер для PATCH /users/me/avatar
 export const updateUserAvatar = async (req, res, next) => {
   try {
-    // Проверяем, что файл пришёл
-    if (!req.file || !req.file.buffer) {
-      throw createHttpError(400, 'No file');
+    // 1. Перевірка, чи є файл
+    if (!req.file) {
+      return next(createHttpError(400, 'No file'));
     }
 
-    // Проверяем авторизованного пользователя
-    if (!req.user || !req.user._id) {
-      throw createHttpError(401, 'Unauthorized');
-    }
+    console.log('✅ File received:', {
+      fieldname: req.file.fieldname,
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+    });
 
-    // Загружаем в Cloudinary
-    let uploadResult;
-    try {
-      uploadResult = await saveFileToCloudinary(req.file.buffer);
-    } catch {
-      throw createHttpError(500, 'Failed to upload avatar, please try again');
-    }
+    // 2. Завантажуємо файл у Cloudinary
+    const uploadResult = await saveFileToCloudinary(req.file.buffer);
 
+    // 3. Отримуємо URL
     const avatarUrl = uploadResult.secure_url;
 
-    // Обновляем пользователя
-    await User.findByIdAndUpdate(
+    // 4. Оновлюємо користувача в БД
+    const user = await User.findByIdAndUpdate(
       req.user._id,
       { avatar: avatarUrl },
       { new: true },
     );
 
-    res.status(200).json({ url: avatarUrl });
+    if (!user) {
+      return next(createHttpError(404, 'User not found'));
+    }
+
+    // 5. Відповідь
+    res.status(200).json({
+      url: user.avatar,
+    });
   } catch (err) {
     next(err);
   }
+};
+
+// Контролер для GET /users/me
+export const getCurrentUser = (req, res) => {
+  res.status(200).json(req.user);
 };

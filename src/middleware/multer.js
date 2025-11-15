@@ -1,19 +1,25 @@
-// src/middleware/multer.js
 import multer from 'multer';
 import createHttpError from 'http-errors';
 
-const storage = multer.memoryStorage();
+// Налаштування multer
+const storage = multer.memoryStorage(); // Зберігаємо файл у пам'яті (буфер)
 
+const limits = {
+  fileSize: 2 * 1024 * 1024, // 2MB
+};
+
+// Фільтр для перевірки типу файлу
 const fileFilter = (req, file, cb) => {
-  if (!file.mimetype.startsWith('image/')) {
-    cb(createHttpError(400, 'Only images allowed'), false);
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true); // Дозволяємо файл
   } else {
-    cb(null, true);
+    // Відхиляємо файл
+    cb(createHttpError(400, 'Only images allowed'), false);
   }
 };
 
 export const upload = multer({
   storage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+  limits,
   fileFilter,
 });

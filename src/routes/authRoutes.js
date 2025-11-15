@@ -1,6 +1,5 @@
-// src/routes/authRoutes.js
-import express from 'express';
-import { celebrate, Segments } from 'celebrate';
+import { Router } from 'express';
+import { celebrate } from 'celebrate';
 import {
   registerUser,
   loginUser,
@@ -16,37 +15,28 @@ import {
   resetPasswordSchema,
 } from '../validations/authValidation.js';
 
-export const authRouter = express.Router();
+const router = Router();
 
-authRouter.post(
-  '/register',
-  celebrate({ [Segments.BODY]: registerUserSchema.body || registerUserSchema }),
-  registerUser,
-);
+// /register
+router.post('/register', celebrate(registerUserSchema), registerUser);
 
-authRouter.post(
-  '/login',
-  celebrate({ [Segments.BODY]: loginUserSchema.body || loginUserSchema }),
-  loginUser,
-);
+// /login
+router.post('/login', celebrate(loginUserSchema), loginUser);
 
-authRouter.post('/refresh', refreshUserSession);
-authRouter.post('/logout', logoutUser);
+// /refresh
+router.post('/refresh', refreshUserSession);
 
-// NEW: request reset email
-authRouter.post(
+// /logout
+router.post('/logout', logoutUser);
+
+// POST /request-reset-email
+router.post(
   '/request-reset-email',
-  celebrate({
-    [Segments.BODY]: requestResetEmailSchema.body || requestResetEmailSchema,
-  }),
+  celebrate(requestResetEmailSchema),
   requestResetEmail,
 );
 
-// NEW: reset password
-authRouter.post(
-  '/reset-password',
-  celebrate({
-    [Segments.BODY]: resetPasswordSchema.body || resetPasswordSchema,
-  }),
-  resetPassword,
-);
+// POST /reset-password
+router.post('/reset-password', celebrate(resetPasswordSchema), resetPassword);
+
+export default router;

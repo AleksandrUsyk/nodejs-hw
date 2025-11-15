@@ -1,29 +1,31 @@
-// src/validations/authValidation.js
-import { Joi } from 'celebrate';
+import { Joi, Segments } from 'celebrate';
 
+// Схема для POST /auth/register
 export const registerUserSchema = {
-  body: Joi.object({
+  [Segments.BODY]: Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
   }),
 };
 
+// Схема для POST /auth/login
 export const loginUserSchema = {
-  body: Joi.object({
+  [Segments.BODY]: Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
   }),
 };
 
-// Нові схеми
+// POST /auth/request-reset-email
 export const requestResetEmailSchema = {
-  body: Joi.object({
+  [Segments.BODY]: Joi.object({
     email: Joi.string().email().required(),
   }),
 };
 
+// POST /auth/reset-password
 export const resetPasswordSchema = {
-  body: Joi.object({
+  [Segments.BODY]: Joi.object({
     token: Joi.string().required(),
     password: Joi.string().min(8).required(),
   }),

@@ -1,18 +1,20 @@
-import { randomBytes } from 'crypto';
 import { Session } from '../models/session.js';
 import { FIFTEEN_MINUTES, ONE_DAY } from '../constants/time.js';
+import crypto from 'crypto';
 
 export const createSession = async (userId) => {
-  const accessToken = randomBytes(30).toString('hex');
-  const refreshToken = randomBytes(30).toString('hex');
+  // 1. Генеруємо ОБИДВА токени як випадкові рядки
+  const accessToken = crypto.randomBytes(32).toString('base64');
+  const refreshToken = crypto.randomBytes(32).toString('base64');
+
+  // 2. Встановлюємо час життя
   const accessTokenValidUntil = new Date(Date.now() + FIFTEEN_MINUTES);
   const refreshTokenValidUntil = new Date(Date.now() + ONE_DAY);
 
-  await Session.deleteMany({ userId });
-
+  // 3. Створюємо сесію в БД
   const session = await Session.create({
     userId,
-    accessToken,
+    accessToken, // Зберігаємо випадковий рядок
     refreshToken,
     accessTokenValidUntil,
     refreshTokenValidUntil,
@@ -23,20 +25,25 @@ export const createSession = async (userId) => {
 
 export const setSessionCookies = (res, session) => {
   const cookieOptions = {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    httpOnly: true, // Захист від XSS
+    secure: true, // Тільки через HTTPS
+    sameSite: 'none', // Дозволяє крос-доменні кукі
   };
 
+  // 1. Access token (короткоживучий)
   res.cookie('accessToken', session.accessToken, {
     ...cookieOptions,
     maxAge: FIFTEEN_MINUTES,
   });
+
+  // 2. Refresh token (довгоживучий)
   res.cookie('refreshToken', session.refreshToken, {
     ...cookieOptions,
     maxAge: ONE_DAY,
   });
-  res.cookie('sessionId', session._id.toString(), {
+
+  // 3. Session ID (для логауту та оновлення)
+  res.cookie('sessionId', session._id, {
     ...cookieOptions,
     maxAge: ONE_DAY,
   });

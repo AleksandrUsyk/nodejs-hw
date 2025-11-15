@@ -1,11 +1,11 @@
-import express from 'express';
-import { celebrate, Segments } from 'celebrate';
+import { Router } from 'express';
+import { celebrate } from 'celebrate';
 import {
   getAllNotes,
   getNoteById,
   createNote,
-  updateNote,
   deleteNote,
+  updateNote,
 } from '../controllers/notesController.js';
 import {
   getAllNotesSchema,
@@ -13,41 +13,27 @@ import {
   createNoteSchema,
   updateNoteSchema,
 } from '../validations/notesValidation.js';
+// Імпортуємо наш новий middleware
 import { authenticate } from '../middleware/authenticate.js';
 
-export const notesRouter = express.Router();
+const router = Router();
 
-notesRouter.use(authenticate);
+// Застосовуємо 'authenticate' до ВСІХ маршрутів нотаток
+router.use(authenticate);
 
-notesRouter.get(
-  '/',
-  celebrate({ [Segments.QUERY]: getAllNotesSchema }),
-  getAllNotes,
-);
+// GET
+router.get('/', celebrate(getAllNotesSchema), getAllNotes);
 
-notesRouter.get(
-  '/:noteId',
-  celebrate({ [Segments.PARAMS]: noteIdSchema }),
-  getNoteById,
-);
+// GET /:noteId
+router.get('/:noteId', celebrate(noteIdSchema), getNoteById);
 
-notesRouter.post(
-  '/',
-  celebrate({ [Segments.BODY]: createNoteSchema }),
-  createNote,
-);
+// POST /
+router.post('/', celebrate(createNoteSchema), createNote);
 
-notesRouter.patch(
-  '/:noteId',
-  celebrate({
-    [Segments.PARAMS]: noteIdSchema,
-    [Segments.BODY]: updateNoteSchema,
-  }),
-  updateNote,
-);
+// DELETE /:noteId
+router.delete('/:noteId', celebrate(noteIdSchema), deleteNote);
 
-notesRouter.delete(
-  '/:noteId',
-  celebrate({ [Segments.PARAMS]: noteIdSchema }),
-  deleteNote,
-);
+// PATCH /:noteId
+router.patch('/:noteId', celebrate(updateNoteSchema), updateNote);
+
+export default router;
