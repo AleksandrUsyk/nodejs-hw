@@ -2,7 +2,6 @@ import { v2 as cloudinary } from 'cloudinary';
 import { Readable } from 'stream';
 
 export const saveFileToCloudinary = async (buffer) => {
-  // Конфігуємо Cloudinary тут, коли .env вже точно завантажений
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -20,6 +19,11 @@ export const saveFileToCloudinary = async (buffer) => {
       {
         folder: 'avatars',
         resource_type: 'image',
+
+        // ⭐ Обов'язкові параметри згідно ТЗ
+        overwrite: true,
+        unique_filename: false,
+        // або замість цього можна use_filename: true
       },
       (error, result) => {
         if (error) {
@@ -32,7 +36,6 @@ export const saveFileToCloudinary = async (buffer) => {
       },
     );
 
-    const readableStream = Readable.from(buffer);
-    readableStream.pipe(stream);
+    Readable.from(buffer).pipe(stream);
   });
 };

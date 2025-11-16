@@ -10,31 +10,22 @@ import { connectMongoDB } from './db/connectMongoDB.js';
 import { logger } from './middleware/logger.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
+
 import notesRouter from './routes/notesRoutes.js';
 import authRouter from './routes/authRoutes.js';
 import userRouter from './routes/userRoutes.js';
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
   try {
-    console.log('📧 SMTP Configuration:');
-    console.log('  HOST:', process.env.SMTP_HOST);
-    console.log('  PORT:', process.env.SMTP_PORT);
-    console.log('  USER:', process.env.SMTP_USER);
-    console.log('  FROM:', process.env.SMTP_FROM);
-
     await connectMongoDB();
     const app = express();
 
-    // CORS - дозволяємо тільки ваш фронтенд
     app.use(
       cors({
-        origin: [
-          'https://nodejs-hw.vercel.app',
-          'http://localhost:3000', // Для локальної розробки
-        ],
-        credentials: true, // Дозволяємо куки
+        origin: ['https://nodejs-hw.vercel.app', 'http://localhost:3000'],
+        credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
       }),
@@ -44,12 +35,12 @@ const startServer = async () => {
     app.use(express.json());
     app.use(cookieParser());
 
-    // Routes
-    app.use('/auth', authRouter);
-    app.use('/notes', notesRouter);
-    app.use('/users', userRouter);
+    // 🔥 Правильно: підключаємо БЕЗ префіксів
+    app.use(authRouter);
+    app.use(notesRouter);
+    app.use(userRouter);
 
-    // Error handling
+    // Error handlers
     app.use(notFoundHandler);
     app.use(errors());
     app.use(errorHandler);
