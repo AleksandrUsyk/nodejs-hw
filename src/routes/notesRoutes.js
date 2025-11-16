@@ -21,19 +21,19 @@ const router = Router();
 // Застосовуємо 'authenticate' до ВСІХ маршрутів нотаток
 router.use(authenticate);
 
-// GET
-router.get('/', celebrate(getAllNotesSchema), getAllNotes);
+// GET /notes
+router.get('/notes', celebrate(getAllNotesSchema), getAllNotes);
 
-// GET /:noteId
-router.get('/:noteId', celebrate(noteIdSchema), getNoteById);
+// GET /notes/:noteId
+router.get('/notes/:noteId', celebrate(noteIdSchema), getNoteById);
 
-// POST /
-router.post('/', celebrate(createNoteSchema), createNote);
+// POST /notes
+router.post('/notes', celebrate(createNoteSchema), createNote);
 
-// DELETE /:noteId
-router.delete('/:noteId', celebrate(noteIdSchema), deleteNote);
+// DELETE /notes/:noteId
+router.delete('/notes/:noteId', celebrate(noteIdSchema), deleteNote);
 
-// PATCH /:noteId
-router.patch('/:noteId', celebrate(updateNoteSchema), updateNote);
+// PATCH /notes/:noteId
+router.patch('/notes/:noteId', celebrate(updateNoteSchema), updateNote);
 
 export default router;
