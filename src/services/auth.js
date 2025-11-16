@@ -24,25 +24,24 @@ export const createSession = async (userId) => {
 };
 
 export const setSessionCookies = (res, session) => {
+  const isProd = process.env.NODE_ENV === 'production';
+
   const cookieOptions = {
-    httpOnly: true, // Захист від XSS
-    secure: true, // Тільки через HTTPS
-    sameSite: 'none', // Дозволяє крос-доменні кукі
+    httpOnly: true,
+    secure: isProd, // только HTTPS на проде
+    sameSite: isProd ? 'none' : 'lax', // кросс-домен на проде, lax на локале
   };
 
-  // 1. Access token (короткоживучий)
   res.cookie('accessToken', session.accessToken, {
     ...cookieOptions,
     maxAge: FIFTEEN_MINUTES,
   });
 
-  // 2. Refresh token (довгоживучий)
   res.cookie('refreshToken', session.refreshToken, {
     ...cookieOptions,
     maxAge: ONE_DAY,
   });
 
-  // 3. Session ID (для логауту та оновлення)
   res.cookie('sessionId', session._id, {
     ...cookieOptions,
     maxAge: ONE_DAY,
