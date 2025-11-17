@@ -16,12 +16,9 @@ export const registerUser = async (req, res, next) => {
       return next(createHttpError(400, 'Email in use'));
     }
 
-    // ❗ Обов’язкове явне хешування (вимога ТЗ)
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = await User.create({
       email,
-      password: hashedPassword,
+      password,
       ...rest,
     });
 
