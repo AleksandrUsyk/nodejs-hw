@@ -8,15 +8,15 @@ import {
 
 const router = Router();
 
-// Отримуємо дані поточного користувача
-router.get('/me', authenticate, getCurrentUser);
+// GET /users/me
+router.get('/users/me', authenticate, getCurrentUser);
 
-// Маршрут для оновлення аватара
+// PATCH /users/me/avatar
 router.patch(
-  '/me/avatar',
-  authenticate, // 1. Перевіряємо, чи користувач залогінений
-  upload.single('avatar'), // 2. Обробляємо 1 файл з полем 'avatar'
-  updateUserAvatar, // 3. Викликаємо контролер
+  '/users/me/avatar',
+  authenticate,
+  upload.single('avatar'),
+  updateUserAvatar,
 );
 
 export default router;
