@@ -16,11 +16,13 @@ export const registerUser = async (req, res, next) => {
       return next(createHttpError(400, 'Email in use'));
     }
 
-    const user = await User.create({
+    const user = new User({
       email,
       password,
       ...rest,
     });
+
+    await user.save(); // запускає pre('save') і хешує пароль
 
     const session = await createSession(user._id);
     setSessionCookies(res, session);
